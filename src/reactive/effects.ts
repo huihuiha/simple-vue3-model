@@ -1,3 +1,3 @@
-export const effects = (fn) => {
-    
+export const effects = (fn: () => {}) => {
+    // const 
 }

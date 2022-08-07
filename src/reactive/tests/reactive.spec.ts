@@ -1,5 +1,9 @@
-import sum from '../index';
+import { reactive } from '../reactive';
 
-test("adds 1 + 2 to equal 3", () => {
-  expect(sum(1, 2)).toBe(3);
+describe("init reactive", () => {
+  test("return value is ideal", () => {
+    const obj = {age: 18};
+    const proxyObj = reactive<typeof obj>(obj);
+    expect(proxyObj.age).toBe(obj.age);
+  });
 });
