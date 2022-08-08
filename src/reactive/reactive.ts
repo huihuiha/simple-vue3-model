@@ -14,7 +14,7 @@ export const reactive = <T>(obj): T => {
             const res = Reflect.set(target, key, value);
 
             // 触发依赖，更新视图
-            // trigger(target, key, value);
+            trigger(target, key);
 
             return res;
         }

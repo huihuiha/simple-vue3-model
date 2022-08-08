@@ -7,16 +7,17 @@ export const effect = (fn: () => void) => {
     effectFn.run();
 }
 
+// 相当于对fn做了一层封装
 class TargetKey {
-    public fn = () => {};
+    public _fn = () => {};
 
     constructor(fn) {
-        this.fn = fn;
-        effectActive = this;
+        this._fn = fn;
     }
-
+    
     run() {
-        this.fn();
+        effectActive = this;
+        this._fn();
     }
 }
 
@@ -44,6 +45,12 @@ export const track = (target, key) => {
 }
 
 // 触发依赖
-export const trigger = (traget, key, value) => {
+export const trigger = (traget, key) => {
+    const depsMap = targetMap.get(traget);
+    
+    const deps = depsMap.get(key);
 
+    for (let dep of deps) {
+        dep.run();
+    }
 }
