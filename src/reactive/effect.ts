@@ -1,10 +1,12 @@
 let effectActive;
-export const effect = (fn: () => void) => {
+export const effect = (fn: () => any) => {
     // 中间套一层对象，目的是用于存储
     const effectFn = new TargetKey(fn);
 
     // 执行effect传入的fn
     effectFn.run();
+
+    return effectFn.run.bind(effectFn);
 }
 
 // 相当于对fn做了一层封装
@@ -17,7 +19,7 @@ class TargetKey {
     
     run() {
         effectActive = this;
-        this._fn();
+        return this._fn();
     }
 }
 
