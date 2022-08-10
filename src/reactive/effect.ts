@@ -3,8 +3,8 @@ let effectActive;
 // 存放targer -> key -> value 的关系
 const targetMap = new Map();
 
-// 相当于对fn做了一层封装
-class TargetKey {
+// 相当于对 fn 做了一层封装
+class ActiveEffect {
     public _fn = () => {};
 
     constructor(fn, public scheduler?) {
@@ -17,9 +17,10 @@ class TargetKey {
     }
 }
 
+// effect函数
 export const effect = (fn: () => any, option: any = {}) => {
     // 中间套一层对象，目的是用于存储
-    const effectFn = new TargetKey(fn, option.scheduler);
+    const effectFn = new ActiveEffect(fn, option.scheduler);
 
     // 执行effect传入的fn
     effectFn.run();
@@ -48,9 +49,6 @@ export const track = (target, key) => {
     deps.add(effectActive);
 }
 
-
-
-
 // 触发依赖
 export const trigger = (traget, key) => {
     const depsMap = targetMap.get(traget);
@@ -65,4 +63,9 @@ export const trigger = (traget, key) => {
             dep.run();
         }
     }
+}
+
+// stop
+export const stop = (runner: any) => {
+
 }
