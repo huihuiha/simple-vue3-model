@@ -10,6 +10,10 @@ describe("effect", () => {
       num = obj.age + 1;
     });
     expect(num).toBe(19);
+
+    // update
+    obj.age++;
+    expect(num).toBe(20);
   });
 
   it("effect 里面的响应式数据发生变化的时候，是否会触发依赖函数执行", () => {

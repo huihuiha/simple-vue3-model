@@ -1,8 +1,3 @@
-// 存放当前 dep 实例
-let activeEffect;
-// 存放targer -> key -> value 的关系
-const targetMap = new Map();
-
 // 相当于对 fn 做了一层封装
 class ActiveEffect {
   active = true;
@@ -10,7 +5,7 @@ class ActiveEffect {
   public _fn = () => {};
   deps = [];
 
-  constructor(fn, public scheduler?) {
+  constructor(fn: () => void, public scheduler?) {
     this._fn = fn;
   }
 
@@ -26,12 +21,14 @@ class ActiveEffect {
   }
 }
 
+// 存放当前对象的 dep 实例
+let activeEffect;
 // effect函数
-export const effect = (fn: () => any, option: any = {}) => {
+export const effect = (fn: () => void, option: any = {}) => {
   // 中间套一层对象，目的是用于存储
   const _effect = new ActiveEffect(fn, option.scheduler);
 
-  // 执行effect传入的fn
+  // 执行effect函数传入的fn
   _effect.run();
 
   const bindFn = _effect.run.bind(_effect);
@@ -40,6 +37,8 @@ export const effect = (fn: () => any, option: any = {}) => {
   return bindFn;
 };
 
+// 存放targer -> key -> value 的关系
+const targetMap = new Map();
 // 跟踪依赖
 export const track = (target, key) => {
   // { target: { key: [dep1, dep2, dep3]} }
@@ -65,8 +64,10 @@ export const track = (target, key) => {
 
 // 触发依赖
 export const trigger = (traget, key) => {
+  // 获取对象的 map
   const depsMap = targetMap.get(traget);
 
+  // 获取对应key所收集的依赖（fn）
   const deps = depsMap.get(key);
 
   for (let dep of deps) {
