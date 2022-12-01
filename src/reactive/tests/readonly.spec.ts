@@ -1,4 +1,4 @@
-import { readonly } from '../reactive';
+import { readonly, isReadonly } from '../reactive';
 
 describe('readonly', () => {
   it('不可改写', () => {
@@ -6,6 +6,9 @@ describe('readonly', () => {
     const wrapped = readonly(obj);
     expect(wrapped).not.toBe(obj);
     expect(wrapped.foo).toBe(1);
+    // 判断是否是只读属性
+    expect(isReadonly(wrapped)).toBe(true);
+    expect(isReadonly(obj)).toBe(false);
   });
 
   it('触发 readonly set的时候，作出警告', () => {

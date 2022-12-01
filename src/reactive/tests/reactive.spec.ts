@@ -1,4 +1,4 @@
-import { reactive } from '../reactive';
+import { reactive, isReactive } from '../reactive';
 
 describe("init reactive", () => {
   test("return value is ideal", () => {
@@ -6,5 +6,8 @@ describe("init reactive", () => {
     const proxyObj = reactive(obj);
     expect(proxyObj).not.toBe(obj);
     expect(proxyObj.age).toBe(obj.age);
+
+    // 是否响应式对象
+    expect(isReactive(proxyObj)).toBe(true);
   });
 });
