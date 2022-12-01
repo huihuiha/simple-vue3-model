@@ -1,5 +1,5 @@
 // 相当于对 fn 做了一层封装
-class ActiveEffect {
+class ReactiveEffect {
   active = true;
   // effect 传入的fn
   public _fn = () => {};
@@ -26,7 +26,7 @@ let activeEffect;
 // effect函数
 export const effect = (fn: () => void, option: any = {}) => {
   // 中间套一层对象，目的是用于存储
-  const _effect = new ActiveEffect(fn, option.scheduler);
+  const _effect = new ReactiveEffect(fn, option.scheduler);
 
   // 执行effect函数传入的fn
   _effect.run();

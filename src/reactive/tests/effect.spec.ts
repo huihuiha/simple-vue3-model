@@ -27,7 +27,8 @@ describe("effect", () => {
   });
 
 
-  it('effect 函数返回runner，runner执行，fn也会执行', () => {
+  it('effect 函数返回runner，runner执行，fn也会执行，当调用runner的时候，能够拿到fn return 的结果', () => {
+    // 1.effect(fn) -> funciton (runner) -> fn -> return
     let foo = 10;
     const runner: any = effect(() => {
       foo += 1;
