@@ -41,6 +41,10 @@ describe("effect", () => {
   })
 
   it("scheduler", () => {
+    // 1.通过effect的第二个参数给定一个scheduler的fn
+    // 2.effect 第一次执行的时候，绘制行fn
+    // 3.当响应式对象set、update不会执行fn，而是执行schedukar
+    // 4.当执行runner的时候，则执行fn
     let dummy;
     let run: any;
     const scheduler = jest.fn(() => {

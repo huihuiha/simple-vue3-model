@@ -7,6 +7,7 @@ class ReactiveEffect {
 
   constructor(fn: () => void, public scheduler?) {
     this._fn = fn;
+    this.scheduler = scheduler;
   }
 
   run() {
@@ -31,6 +32,7 @@ export const effect = (fn: () => void, option: any = {}) => {
   // 执行effect函数传入的fn
   _effect.run();
 
+  // 修改this的执行
   const bindFn = _effect.run.bind(_effect);
   bindFn.effect = _effect;
 
