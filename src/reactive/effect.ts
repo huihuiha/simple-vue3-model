@@ -1,5 +1,7 @@
 import { extend } from './../shared/index';
 
+let shouldTrack;
+
 // 相当于对 fn 做了一层封装
 class ReactiveEffect {
   active = true;
@@ -15,8 +17,18 @@ class ReactiveEffect {
   }
 
   run() {
+    if(!this.active) {
+      return this._fn();
+    }
+
+    shouldTrack = true;
     activeEffect = this;
-    return this._fn();
+
+    const result = this._fn();
+    // reset
+    shouldTrack = false;
+
+    return result;
   }
 
   stop() {
@@ -33,7 +45,8 @@ class ReactiveEffect {
 function cleanupEffect(effect) {
   effect.deps.forEach(dep => {
     dep.delete(effect);
-  })
+  });
+  effect.deps.length = 0;
 }
 
 // 存放当前对象的 dep 实例
@@ -56,12 +69,18 @@ export const effect = (fn: () => void, options: any = {}) => {
   return bindFn;
 };
 
+function isTracking() {
+  return shouldTrack && activeEffect !== undefined;
+}
+
 // 存放targer -> key -> value 的关系
 const targetMap = new Map();
 // 跟踪依赖
 export const track = (target, key) => {
-  // { target: { key: [dep1, dep2, dep3]} }
+  // 反向收集dep
+  if (!isTracking()) return;
 
+  // { target: { key: [dep1, dep2, dep3]} }
   let depsMap = targetMap.get(target);
   // 没有deps依赖，则target -> key的关系
   if (!depsMap) {
@@ -76,9 +95,10 @@ export const track = (target, key) => {
     depsMap.set(key, dep);
   }
 
-  dep.add(activeEffect);
+  // 已经在dep中
+  if (dep.has(activeEffect)) return;
 
-  // 反向收集dep
+  dep.add(activeEffect);
   activeEffect && activeEffect.deps.push(dep);
 };
 
