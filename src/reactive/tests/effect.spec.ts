@@ -71,6 +71,7 @@ describe("effect", () => {
   });
 
   it("stop", () => {
+    // 调用stop方法，就不更新响应式数据里面的值了
     let dummy;
     const obj: any = reactive({ prop: 1 });
     const runner = effect(() => {
@@ -78,13 +79,27 @@ describe("effect", () => {
     });
     obj.prop = 2;
     expect(dummy).toBe(2);
+    // 调用stop方法
     stop(runner);
-    // obj.prop = 3
-    obj.prop = 2;
+    obj.prop = 3;
     expect(dummy).toBe(2);
 
     // stopped effect should still be manually callable
     runner();
-    // expect(dummy).toBe(3);
+    expect(dummy).toBe(3);
   });
+
+  it('onStop', () => {
+    const obj = reactive({
+      foo: 1,
+    });
+    const onStop = jest.fn();
+    let dummy;
+    const runner = effect(() => {
+      dummy = obj.foo;
+    }, {onStop});
+
+    stop(runner);
+    expect(onStop).toBeCalledTimes(1);
+  })
 });
