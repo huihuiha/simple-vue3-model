@@ -28,3 +28,7 @@ export function readonly(raw: any) {
 export function shallowReadonly(raw: any) {
   return createActiveObjct(raw, shallowReadonlyHandlers);
 }
+
+export function isProxy(val: any) {
+  return isReadonly(val) || isReactive(val);
+}
