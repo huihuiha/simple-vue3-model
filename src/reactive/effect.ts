@@ -17,7 +17,7 @@ class ReactiveEffect {
   }
 
   run() {
-    if(!this.active) {
+    if (!this.active) {
       return this._fn();
     }
 
@@ -69,7 +69,7 @@ export const effect = (fn: () => void, options: any = {}) => {
   return bindFn;
 };
 
-function isTracking() {
+export function isTracking() {
   return shouldTrack && activeEffect !== undefined;
 }
 
@@ -95,12 +95,16 @@ export const track = (target: any, key: string) => {
     depsMap.set(key, dep);
   }
 
+  trackEffects(dep);
+};
+
+export function trackEffects(dep: any) {
   // 已经在dep中
   if (dep.has(activeEffect)) return;
 
   dep.add(activeEffect);
   activeEffect && activeEffect.deps.push(dep);
-};
+}
 
 // 触发依赖
 export const trigger = (traget: any, key: string) => {
@@ -108,16 +112,20 @@ export const trigger = (traget: any, key: string) => {
   const depsMap = targetMap.get(traget);
 
   // 获取对应key所收集的依赖（fn）
-  const deps = depsMap.get(key);
+  const dep = depsMap.get(key);
 
-  for (let dep of deps) {
-    if (dep.scheduler) {
-      dep.scheduler();
+  triggerEffects(dep);
+};
+
+export function triggerEffects(dep: any) {
+  for (let effect of dep) {
+    if (effect.scheduler) {
+      effect.scheduler();
     } else {
-      dep.run();
+      effect.run();
     }
   }
-};
+}
 
 // stop
 export const stop = (runner: any) => {
