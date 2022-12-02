@@ -1,16 +1,14 @@
 import { track, trigger } from './effect';
 import { reactive, ReactiveFlags, readonly } from './reactive';
-import { isObject } from '../shared';
+import { isObject, extend } from '../shared';
 
 const get = createGetter(false);
 const set = createSetter();
 const readonlyGet = createGetter(true);
+const shallowReadonlyGet = createGetter(true, true);
 
-function createGetter(isReadonly = false) {
+function createGetter(isReadonly = false, shallow = false) {
   return function get(target, key) {
-    // 获取结果
-    const res = Reflect.get(target, key);
-
     // 判断是否是响应式数据
     if (key === ReactiveFlags.IS_REACTIVE) {
       return !isReadonly;
@@ -20,6 +18,11 @@ function createGetter(isReadonly = false) {
     if (key === ReactiveFlags.IS_READONLY) {
       return isReadonly;
     }
+
+    // 获取结果
+    const res = Reflect.get(target, key);
+
+    if (shallow) return res;
 
     // 如果是obejct，则继续数据响应
     if (isObject(res)) {
@@ -57,3 +60,7 @@ export const readonlyHandlers = {
     return true;
   },
 };
+
+export const shallowReadonlyHandlers = extend({}, readonlyHandlers, {
+  get: shallowReadonlyGet,
+});
