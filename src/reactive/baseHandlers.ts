@@ -1,5 +1,6 @@
 import { track, trigger } from './effect';
-import { ReactiveFlags } from './reactive';
+import { reactive, ReactiveFlags, readonly } from './reactive';
+import { isObject } from '../shared';
 
 const get = createGetter(false);
 const set = createSetter();
@@ -18,6 +19,11 @@ function createGetter(isReadonly = false) {
     // 判断是否是只读属性
     if (key === ReactiveFlags.IS_READONLY) {
       return isReadonly;
+    }
+
+    // 如果是obejct，则继续数据响应
+    if (isObject(res)) {
+      return isReadonly ? readonly(res) : reactive(res);
     }
 
     // 收集依赖

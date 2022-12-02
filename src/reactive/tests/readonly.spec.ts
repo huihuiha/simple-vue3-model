@@ -17,4 +17,11 @@ describe('readonly', () => {
     user.age = 11;
     expect(console.warn).toBeCalledTimes(1);
   });
+
+  it('嵌套是否只读', () => {
+    const obj = { foo: 1, bar: { baz: 2} };
+    const wrapped = readonly(obj);
+    expect(isReadonly(wrapped.bar)).toBe(true);
+    expect(isReadonly(obj.bar)).toBe(false);
+  })
 });
