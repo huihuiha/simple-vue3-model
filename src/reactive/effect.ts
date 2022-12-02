@@ -1,6 +1,6 @@
 import { extend } from './../shared/index';
 
-let shouldTrack;
+let shouldTrack: any;
 
 // 相当于对 fn 做了一层封装
 class ReactiveEffect {
@@ -11,7 +11,7 @@ class ReactiveEffect {
   deps = [];
   onStop?: () => void;
 
-  constructor(fn: () => void, public scheduler?) {
+  constructor(fn: () => void, public scheduler?: any) {
     this._fn = fn;
     this.scheduler = scheduler;
   }
@@ -42,15 +42,15 @@ class ReactiveEffect {
   }
 }
 
-function cleanupEffect(effect) {
-  effect.deps.forEach(dep => {
+function cleanupEffect(effect: any) {
+  effect.deps.forEach((dep: any) => {
     dep.delete(effect);
   });
   effect.deps.length = 0;
 }
 
 // 存放当前对象的 dep 实例
-let activeEffect;
+let activeEffect: any;
 // effect函数
 export const effect = (fn: () => void, options: any = {}) => {
   // 中间套一层对象，目的是用于存储
@@ -76,7 +76,7 @@ function isTracking() {
 // 存放targer -> key -> value 的关系
 const targetMap = new Map();
 // 跟踪依赖
-export const track = (target, key) => {
+export const track = (target: any, key: string) => {
   // 反向收集dep
   if (!isTracking()) return;
 
@@ -103,7 +103,7 @@ export const track = (target, key) => {
 };
 
 // 触发依赖
-export const trigger = (traget, key) => {
+export const trigger = (traget: any, key: string) => {
   // 获取对象的 map
   const depsMap = targetMap.get(traget);
 

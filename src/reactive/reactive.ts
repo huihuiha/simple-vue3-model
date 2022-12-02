@@ -13,7 +13,7 @@ export function isReadonly(value: any) {
   return !!value[ReactiveFlags.IS_READONLY]
 }
 
-function createActiveObjct(raw: any, baseHandler): any {
+function createActiveObjct(raw: any, baseHandler: any): any {
   return new Proxy(raw, baseHandler);
 }
 
@@ -21,10 +21,10 @@ export function reactive(raw: Record<string, any>) {
   return createActiveObjct(raw, mutableHandlers);
 }
 
-export function readonly(raw) {
+export function readonly(raw: any) {
   return createActiveObjct(raw, readonlyHandlers);
 }
 
-export function shallowReadonly(raw) {
+export function shallowReadonly(raw: any) {
   return createActiveObjct(raw, shallowReadonlyHandlers);
 }

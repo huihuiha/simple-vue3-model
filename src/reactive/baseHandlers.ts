@@ -8,7 +8,7 @@ const readonlyGet = createGetter(true);
 const shallowReadonlyGet = createGetter(true, true);
 
 function createGetter(isReadonly = false, shallow = false) {
-  return function get(target, key) {
+  return function get(target: any, key: string) {
     // 判断是否是响应式数据
     if (key === ReactiveFlags.IS_REACTIVE) {
       return !isReadonly;
@@ -38,7 +38,7 @@ function createGetter(isReadonly = false, shallow = false) {
 }
 
 function createSetter() {
-  return function set(target, key, value) {
+  return function set(target: any, key: string, value: any) {
     // 获取结果
     const res = Reflect.set(target, key, value);
     // 触发依赖，更新视图
@@ -55,8 +55,8 @@ export const mutableHandlers = {
 export const readonlyHandlers = {
   get: readonlyGet,
 
-  set(target, key, value) {
-    console.warn(`key: ${key} set 失败，因为 target 是 readonly`);
+  set(target: any, key: string, value: any) {
+    console.warn(`key: ${key} set ${value} 失败，因为 ${target} 是 readonly`);
     return true;
   },
 };
