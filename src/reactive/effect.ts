@@ -3,7 +3,7 @@ import { extend } from './../shared/index';
 let shouldTrack: any;
 
 // 相当于对 fn 做了一层封装
-class ReactiveEffect {
+export class ReactiveEffect {
   active = true;
   // effect 传入的fn
   public _fn = () => {};
