@@ -1,6 +1,6 @@
-export function createVNode(typr, props?, children?) {
+export function createVNode(type, props?, children?) {
   const vnode = {
-    tyoe,
+    type,
     props,
     children,
   };

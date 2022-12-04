@@ -2,6 +2,8 @@ import { createComponentInstance, setupComponent } from './component';
 
 export function render(vnode, container) {
   // patch
+  // TODO: 判断Vnode是不是一个element
+  // 是 element 那就处理element
   patch(vnode, container);
 }
 
