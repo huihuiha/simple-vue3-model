@@ -1,4 +1,4 @@
-import { isObject } from './../shared/index';
+import { ShapeFlags } from '../shared/shapeFlags';
 import { createComponentInstance, setupComponent } from './component';
 
 export function render(vnode: any, container: any) {
@@ -7,17 +7,20 @@ export function render(vnode: any, container: any) {
   patch(vnode, container);
 }
 
-function patch(vnode, container) {
+function patch(vnode: any, container: any) {
+  // shapreFlags
+  // vnode -> flag
   // 处理组件
   // 判断是不是element
-  if (typeof vnode.type === 'string') {
+  const { shapeFlag } = vnode;
+  if (shapeFlag & ShapeFlags.ELEMENT) {
     processElement(vnode, container);
-  } else if (isObject) {
+  } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
     proccessComponent(vnode, container);
   }
 }
 
-function processElement(vnode, container) {
+function processElement(vnode: any, container: any) {
   // init -> update
   mountElement(vnode, container);
 }
@@ -25,12 +28,14 @@ function processElement(vnode, container) {
 function mountElement(vnode: any, container: any) {
   const el = (vnode.el = document.createElement(vnode.type));
   // srting array
-  const { children, props } = vnode;
+  const { children, props, shapeFlag } = vnode;
 
   // children 可以是string 或者 array
-  if (typeof children === 'string') {
+  if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+    // text_children
     el.textContent = children;
-  } else if (Array.isArray(children)) {
+  } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+    // array_children
     mountChildren(vnode, el);
   }
   // props
@@ -38,6 +43,7 @@ function mountElement(vnode: any, container: any) {
     const val = props[key];
     el.setAttribute(key, val);
   }
+
 
   container.append(el);
 }
@@ -48,17 +54,17 @@ function mountChildren(vnode: any, container: any) {
   });
 }
 
-function proccessComponent(vnode, container) {
+function proccessComponent(vnode: any, container: any) {
   mountComponent(vnode, container);
 }
-function mountComponent(initialVNode: any, container) {
+function mountComponent(initialVNode: any, container: any) {
   const instance = createComponentInstance(initialVNode);
 
   setupComponent(instance);
   setupRenderEffect(instance, initialVNode, container);
 }
 
-function setupRenderEffect(instance: any, initialVNode, container) {
+function setupRenderEffect(instance: any, initialVNode: any, container: any) {
   const { proxy } = instance;
   const subTree = instance.render.call(proxy);
 
