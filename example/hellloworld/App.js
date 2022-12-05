@@ -8,8 +8,8 @@ export const App = {
         id: 'root',
         class: ['red', 'hard'],
       },
-      [h('p', { class: 'red' }, 'hi')]
-      // "123123" + this.msg
+      // [h('p', { class: 'red' }, 'hi'), ]
+      "123123" + this.msg
     );
   },
 
