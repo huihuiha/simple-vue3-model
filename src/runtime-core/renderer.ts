@@ -1,5 +1,6 @@
 import { ShapeFlags } from '../shared/shapeFlags';
 import { createComponentInstance, setupComponent } from './component';
+import { Fragment, Text } from './vnode';
 
 export function render(vnode: any, container: any) {
   // patch
@@ -12,11 +13,22 @@ function patch(vnode: any, container: any) {
   // vnode -> flag
   // 处理组件
   // 判断是不是element
-  const { shapeFlag } = vnode;
-  if (shapeFlag & ShapeFlags.ELEMENT) {
-    processElement(vnode, container);
-  } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-    proccessComponent(vnode, container);
+  const { shapeFlag, type } = vnode;
+
+  // Fragment -> 只渲染 children
+  switch (type) {
+    case Fragment:
+      processFragment(vnode, container);
+      break;
+    case Text:
+      processText(vnode, container);
+      break;
+    default:
+      if (shapeFlag & ShapeFlags.ELEMENT) {
+        processElement(vnode, container);
+      } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+        proccessComponent(vnode, container);
+      }
   }
 }
 
@@ -81,4 +93,13 @@ function setupRenderEffect(instance: any, initialVNode: any, container: any) {
 
   // element -> mounted
   initialVNode.el = subTree.el;
+}
+function processFragment(vnode: any, container: any) {
+  mountChildren(vnode, container);
+}
+function processText(vnode: any, container: any) {
+  const { children } = vnode;
+  console.log(children, "000000000")
+  const textNode = (vnode.el = document.createTextNode(children));
+  container.append(textNode);
 }
