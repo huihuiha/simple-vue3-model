@@ -99,7 +99,6 @@ function processFragment(vnode: any, container: any) {
 }
 function processText(vnode: any, container: any) {
   const { children } = vnode;
-  console.log(children, "000000000")
   const textNode = (vnode.el = document.createTextNode(children));
   container.append(textNode);
 }

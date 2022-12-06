@@ -11,7 +11,7 @@ export function createComponentInstance(vnode: any) {
     setupState: {},
     props: {},
     slots: {},
-    emit: () => {}
+    emit: () => {},
   };
 
   component.emit = emit.bind({}, component) as any;
@@ -22,7 +22,6 @@ export function createComponentInstance(vnode: any) {
 export function setupComponent(instance: any) {
   // 初始化props
   initProps(instance, instance.vnode.props);
-  console.log(instance.vnode)
   initSlots(instance, instance.vnode.children);
 
   // 初始化有状态的组件
@@ -32,18 +31,17 @@ export function setupComponent(instance: any) {
 function setupStatefulComponent(instance: any) {
   const Component = instance.type;
 
-  instance.proxy = new Proxy(
-    {_: instance},
-    PublicInstanceProxyHandlers
-  );
+  instance.proxy = new Proxy({ _: instance }, PublicInstanceProxyHandlers);
 
   const { setup } = Component;
 
   if (setup) {
+    setCurrentInstance(instance);
     // 可以是function、object
-    const setupResult = setup(shallowReadonly(instance.props),{
-      emit: instance.emit
+    const setupResult = setup(shallowReadonly(instance.props), {
+      emit: instance.emit,
     });
+    setCurrentInstance(null);
 
     handleSetupResult(instance, setupResult);
   }
@@ -60,4 +58,13 @@ function finishComponentSetup(instance: any) {
   const Component = instance.type;
 
   instance.render = Component.render;
+}
+
+let currentInstance = null;
+export function getCurrentInstance() {
+  return currentInstance;
+}
+
+export function setCurrentInstance(instance: any) {
+  currentInstance = instance;
 }
