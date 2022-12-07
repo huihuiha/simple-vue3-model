@@ -8,7 +8,8 @@ export const hasChanged = (val: any, newVal: any) => {
   return !Object.is(val, newVal);
 };
 
-export const hasOwn = (val: any, key: string) => Object.prototype.hasOwnProperty.call(val, key);
+export const hasOwn = (val: any, key: string) =>
+  Object.prototype.hasOwnProperty.call(val, key);
 
 export const camelize = (str: string): any => {
   return str.replace(/-(\w)/g, (_, c: string) => {
@@ -23,3 +24,5 @@ export const capitalize = (str: string) => {
 export const toHandlerKey = (str: string) => {
   return str ? `on${capitalize(str)}` : '';
 };
+
+export const EMPTY_OBJ = {};

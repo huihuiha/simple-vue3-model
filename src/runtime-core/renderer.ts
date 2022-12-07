@@ -3,6 +3,7 @@ import { ShapeFlags } from '../shared/shapeFlags';
 import { createComponentInstance, setupComponent } from './component';
 import { createAppApi } from './createApp';
 import { Fragment, Text } from './vnode';
+import { EMPTY_OBJ } from '../shared';
 
 export function createRenderer(options: any) {
   const {
@@ -60,7 +61,7 @@ export function createRenderer(options: any) {
     for (const key in props) {
       const val = props[key];
       // 处理事件, 特性： on + eventname
-      hostPatchProp(el, key, val);
+      hostPatchProp(el, key, null, val);
     }
 
     // container.append(el);
@@ -150,11 +151,43 @@ export function createRenderer(options: any) {
   }
 
   function patchElement(n1: any, n2: any, container: any) {
-    console.log(n1, "n1")
-    console.log(n2, "n2")
+    // 情况一：foo之前的值和现在的值不一样 -> update
+    // 情况二：null || undefined -> 删除
+    // 情况三：bar这个属性在新的里面没有了 -> 删除
+    console.log(n1, 'n1');
+    console.log(n2, 'n2');
+
+    const oldProps = n1.props || EMPTY_OBJ;
+    const newProps = n2.props || EMPTY_OBJ;
+
+    const el = (n2.el = n1.el);
+    patchProps(el, oldProps, newProps);
 
     // 对比props
     // 对比children
+  }
+
+  
+
+  function patchProps(el: any, oldProps: any, newProps: any) {
+    if (oldProps !== newProps) {
+      for (const key in newProps) {
+        const preProp = oldProps[key];
+        const nextProp = newProps[key];
+
+        if (preProp !== nextProp) {
+          hostPatchProp(el, key, preProp, nextProp);
+        }
+      }
+
+      if (oldProps !== EMPTY_OBJ) {
+        for (const key in oldProps) {
+          if (!(key in newProps)) {
+            hostPatchProp(el, key, oldProps[key], null);
+          }
+        }
+      }
+    }
   }
 
   return {
