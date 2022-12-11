@@ -10,6 +10,8 @@ export function createRenderer(options: any) {
     createElement: hostCreateElement,
     patchProp: hostPatchProp,
     insert: hostInsert,
+    remove: hostRemove,
+    setElementText: hostSetElementText,
   } = options;
 
   function render(vnode: any, container: any, parentComponent: any) {
@@ -55,7 +57,7 @@ export function createRenderer(options: any) {
       el.textContent = children;
     } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
       // array_children
-      mountChildren(vnode, el, parentComponent);
+      mountChildren(vnode.children, el, parentComponent);
     }
     // props
     for (const key in props) {
@@ -68,8 +70,8 @@ export function createRenderer(options: any) {
     hostInsert(el, container);
   }
 
-  function mountChildren(vnode: any, container: any, parentComponent: any) {
-    vnode.children.forEach((v: any) => {
+  function mountChildren(children: any, container: any, parentComponent: any) {
+    children.forEach((v: any) => {
       patch(null, v, container, parentComponent);
     });
   }
@@ -117,7 +119,7 @@ export function createRenderer(options: any) {
     container: any,
     parentComponent: any
   ) {
-    mountChildren(n2, container, parentComponent);
+    mountChildren(n2.children, container, parentComponent);
   }
 
   function processText(n1: any, n2: any, container: any) {
@@ -146,28 +148,29 @@ export function createRenderer(options: any) {
       mountElement(n2, container, parentComponent);
     } else {
       // update
-      patchElement(n1, n2, container);
+      patchElement(n1, n2, container, parentComponent);
     }
   }
 
-  function patchElement(n1: any, n2: any, container: any) {
+  function patchElement(
+    n1: any,
+    n2: any,
+    container: any,
+    parentComponent: any
+  ) {
     // 情况一：foo之前的值和现在的值不一样 -> update
     // 情况二：null || undefined -> 删除
     // 情况三：bar这个属性在新的里面没有了 -> 删除
-    console.log(n1, 'n1');
-    console.log(n2, 'n2');
 
     const oldProps = n1.props || EMPTY_OBJ;
     const newProps = n2.props || EMPTY_OBJ;
 
     const el = (n2.el = n1.el);
-    patchProps(el, oldProps, newProps);
-
-    // 对比props
     // 对比children
+    patchChildren(n1, n2, el, parentComponent);
+    // 对比props
+    patchProps(el, oldProps, newProps);
   }
-
-  
 
   function patchProps(el: any, oldProps: any, newProps: any) {
     if (oldProps !== newProps) {
@@ -187,6 +190,43 @@ export function createRenderer(options: any) {
           }
         }
       }
+    }
+  }
+
+  function patchChildren(
+    n1: any,
+    n2: any,
+    container: any,
+    parentComponent: any
+  ) {
+    const prevShapeFlag = n1.shapeFlag;
+    const { shapeFlag } = n2;
+    const c1 = n1.children;
+    const c2 = n2.children;
+
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+      if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+        // 1. 把老的 children 清空
+        unmountChildren(n1.children);
+      }
+      if (c1 !== c2) {
+        // 2. 设置 text
+        hostSetElementText(container, c2);
+      }
+    } else {
+      // 新的是一个数组
+      if (prevShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+        hostSetElementText(container, '');
+        mountChildren(c2, container, parentComponent);
+      }
+    }
+  }
+
+  function unmountChildren(children: any) {
+    for (let i = 0; i < children.length; i++) {
+      const el = children[i].el;
+      // remove
+      hostRemove(el);
     }
   }
 
