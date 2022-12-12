@@ -1,4 +1,4 @@
-import { h } from "../../dist/guide-mini-vue.esm.js";
+import { h } from "../../lib/mini-vue.esm.js";
 export default {
   name: "Child",
   setup(props, { emit }) {},
