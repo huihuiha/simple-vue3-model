@@ -5,6 +5,7 @@ import { createAppApi } from './createApp';
 import { Fragment, Text } from './vnode';
 import { EMPTY_OBJ } from '../shared';
 import { shouldUpdateComponent } from './componentUpdateUtils';
+import { queueJobs } from './scheduler';
 
 export function createRenderer(options: any) {
   const {
@@ -114,35 +115,42 @@ export function createRenderer(options: any) {
     container: any,
     anchor: any
   ) {
-    instance.update = effect(() => {
-      // init
-      if (!instance.isMounted) {
-        const { proxy } = instance;
-        const subTree = (instance.subTree = instance.render.call(proxy));
+    instance.update = effect(
+      () => {
+        // init
+        if (!instance.isMounted) {
+          const { proxy } = instance;
+          const subTree = (instance.subTree = instance.render.call(proxy));
 
-        // vnode -> patch
-        // vnode -> element -> mountElement
-        patch(null, subTree, container, instance, anchor);
+          // vnode -> patch
+          // vnode -> element -> mountElement
+          patch(null, subTree, container, instance, anchor);
 
-        // element -> mounted
-        initialVNode.el = subTree.el;
+          // element -> mounted
+          initialVNode.el = subTree.el;
 
-        instance.isMounted = true;
-      } else {
-        // 需要一个更新后的虚拟节点
-        const { next, vnode } = instance;
-        if (next) {
-          next.el = vnode.el;
-          updateComponentPreRender(instance, next);
+          instance.isMounted = true;
+        } else {
+          // 需要一个更新后的虚拟节点
+          const { next, vnode } = instance;
+          if (next) {
+            next.el = vnode.el;
+            updateComponentPreRender(instance, next);
+          }
+          // update
+          const { proxy } = instance;
+          const subTree = instance.render.call(proxy);
+          const preSubTree = instance.subTree;
+          instance.subTree = subTree;
+          patch(preSubTree, subTree, container, instance, anchor);
         }
-        // update
-        const { proxy } = instance;
-        const subTree = instance.render.call(proxy);
-        const preSubTree = instance.subTree;
-        instance.subTree = subTree;
-        patch(preSubTree, subTree, container, instance, anchor);
+      },
+      {
+        scheduler() {
+          queueJobs(instance.update);
+        },
       }
-    });
+    );
   }
 
   function updateComponentPreRender(instance: any, nextVNode: any) {
