@@ -4,6 +4,7 @@ import { createComponentInstance, setupComponent } from './component';
 import { createAppApi } from './createApp';
 import { Fragment, Text } from './vnode';
 import { EMPTY_OBJ } from '../shared';
+import { shouldUpdateComponent } from './componentUpdateUtils';
 
 export function createRenderer(options: any) {
   const {
@@ -98,7 +99,10 @@ export function createRenderer(options: any) {
     parentComponent: any,
     anchor: any
   ) {
-    const instance = createComponentInstance(initialVNode, parentComponent);
+    const instance = (initialVNode.component = createComponentInstance(
+      initialVNode,
+      parentComponent
+    ));
 
     setupComponent(instance);
     setupRenderEffect(instance, initialVNode, container, anchor);
@@ -110,7 +114,7 @@ export function createRenderer(options: any) {
     container: any,
     anchor: any
   ) {
-    effect(() => {
+    instance.update = effect(() => {
       // init
       if (!instance.isMounted) {
         const { proxy } = instance;
@@ -125,6 +129,12 @@ export function createRenderer(options: any) {
 
         instance.isMounted = true;
       } else {
+        // 需要一个更新后的虚拟节点
+        const { next, vnode } = instance;
+        if (next) {
+          next.el = vnode.el;
+          updateComponentPreRender(instance, next);
+        }
         // update
         const { proxy } = instance;
         const subTree = instance.render.call(proxy);
@@ -133,6 +143,12 @@ export function createRenderer(options: any) {
         patch(preSubTree, subTree, container, instance, anchor);
       }
     });
+  }
+
+  function updateComponentPreRender(instance: any, nextVNode: any) {
+    instance.vnode = nextVNode;
+    instance.next = null;
+    instance.props = nextVNode.props;
   }
 
   function processFragment(
@@ -158,7 +174,22 @@ export function createRenderer(options: any) {
     parentComponent: any,
     anchor: any
   ) {
-    mountComponent(n2, container, parentComponent, anchor);
+    if (!n1) {
+      mountComponent(n2, container, parentComponent, anchor);
+    } else {
+      updateComponent(n1, n2);
+    }
+  }
+
+  function updateComponent(n1: any, n2: any) {
+    const instance = (n2.component = n1.component);
+    if (shouldUpdateComponent(n1, n2)) {
+      instance.next = n2;
+      instance.update();
+    } else {
+      n2.el = n1.el;
+      n2.vnode = n2;
+    }
   }
 
   function processElement(
