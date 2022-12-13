@@ -1,5 +1,5 @@
 # simple-vue3-model
-实现一个核心版本的vue3模型，包含各种数据响应式、初次渲染逻辑、更新逻辑
+实现一个核心版本的vue3模型，包含 reactivity 响应式、runtime 运行时、compiler 编译
 
 ## 完成功能：
 #### runtime-core
