@@ -73,6 +73,7 @@ function parseChildren(context: any, ancestors: any) {
 function createRoot(children: any) {
   return {
     children,
+    type: NodeTypes.ROOT
   };
 }
 
