@@ -86,7 +86,7 @@ describe('Parse', () => {
     });
   });
 
-  test.only('三种类型-缺少结束标签的时候，抛出错误', () => {
+  test('三种类型-缺少结束标签的时候，抛出错误', () => {
     expect(() => {
       baseParse('<div><span></div>');
     }).toThrow(`缺少结束标签：span`);
