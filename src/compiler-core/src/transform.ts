@@ -1,9 +1,10 @@
-export function transform(root: any, options: any) {
+export function transform(root: any, options: any = {}) {
   const context = createTransformContext(root, options);
 
   // 1. 深度优先遍历
   traverseChildren(root, context);
   // 2 修改 text content
+  createRootCodegen(root);
 }
 
 function traverseChildren(node: any, context: any) {
@@ -30,4 +31,7 @@ function createTransformContext(root: any, options: any) {
   };
 
   return context;
+}
+function createRootCodegen(root: any) {
+  root.codegenNode = root.children[0];
 }
