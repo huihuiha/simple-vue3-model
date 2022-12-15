@@ -88,7 +88,6 @@ function advanceBy(context: any, length: number) {
 function parseElement(context: any, ancestors: any) {
   // 1.解析tag
   const element: any = parseTag(context, TagType.Start);
-  console.log(ancestors, '--------------');
   ancestors.push(element);
   element.children = parseChildren(context, ancestors);
   ancestors.pop();
@@ -159,7 +158,6 @@ function isEnd(context: any, ancestors: any) {
 }
 
 function startsWithEndTagOpen(source: any, tag: any) {
-  console.log(source.slice(2, 2 + tag.length), '========================', tag);
   return (
     source.startsWith('</') &&
     source.slice(2, 2 + tag.length).toLowerCase() === tag.toLowerCase()
