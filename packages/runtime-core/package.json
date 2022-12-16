@@ -1,0 +1,16 @@
+{
+  "name": "@simple-vue3-model/runtime-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@simple-vue3-model/reactivity": "workspace:^1.0.0",
+    "@simple-vue3-model/shared": "workspace:^1.0.0"
+  }
+}

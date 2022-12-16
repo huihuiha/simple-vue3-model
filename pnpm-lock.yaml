@@ -1,0 +1,37 @@
+lockfileVersion: 5.4
+
+importers:
+
+  packages/compiler-core:
+    specifiers:
+      '@simple-vue3-model/shared': workspace:^1.0.0
+    dependencies:
+      '@simple-vue3-model/shared': link:../shared
+
+  packages/reactivity:
+    specifiers:
+      '@simple-vue3-model/shared': workspace:^1.0.0
+    dependencies:
+      '@simple-vue3-model/shared': link:../shared
+
+  packages/runtime-core:
+    specifiers:
+      '@simple-vue3-model/reactivity': workspace:^1.0.0
+      '@simple-vue3-model/shared': workspace:^1.0.0
+    dependencies:
+      '@simple-vue3-model/reactivity': link:../reactivity
+      '@simple-vue3-model/shared': link:../shared
+
+  packages/runtime-dom:
+    specifiers:
+      '@simple-vue3-model/runtime-core': workspace:^1.0.0
+    dependencies:
+      '@simple-vue3-model/runtime-core': link:../runtime-core
+
+  packages/vue:
+    specifiers:
+      '@simple-vue3-model/runtime-core': workspace:^1.0.0
+      '@simple-vue3-model/runtime-dom': workspace:^1.0.0
+    dependencies:
+      '@simple-vue3-model/runtime-core': link:../runtime-core
+      '@simple-vue3-model/runtime-dom': link:../runtime-dom
