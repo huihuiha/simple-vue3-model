@@ -13,7 +13,6 @@ export function baseParse(content: string) {
 
 function parseInterpolation(context: any) {
   // 解析 {{message}}
-
   const openDelimiter = '{{';
   const closeDelimiter = '}}';
 
@@ -32,7 +31,7 @@ function parseInterpolation(context: any) {
   // 去除空格
   const content = rawContent.trim();
 
-  advanceBy(context, rawContentLength + closeDelimiter.length);
+  advanceBy(context, closeDelimiter.length);
 
   return {
     type: NodeTypes.INTERPOLATION,
