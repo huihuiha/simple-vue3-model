@@ -1,3 +1,4 @@
+export * from './toDisplayString';
 export const extend = Object.assign;
 
 export const isObject = (val: any) => {
