@@ -1,5 +1,6 @@
 import { computed } from '../src//computed';
 import { reactive } from '../src/reactive';
+import { vi } from 'vitest';
 
 describe('computed', () => {
   it('基本使用', () => {
@@ -19,7 +20,7 @@ describe('computed', () => {
     const value = reactive({
       foo: 1,
     });
-    const getter = jest.fn(() => {
+    const getter = vi.fn(() => {
       return value.foo;
     });
     const cValue = computed(getter);
@@ -36,7 +37,7 @@ describe('computed', () => {
     expect(getter).toHaveBeenCalledTimes(1);
 
     // 不再计算，直到再次需要
-    value.foo = 2;  // trigger -> effect -> get 重新执行
+    value.foo = 2; // trigger -> effect -> get 重新执行
     expect(getter).toHaveBeenCalledTimes(1);
 
     // 需要这个值的时候，需要重新计算

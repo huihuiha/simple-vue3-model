@@ -1,4 +1,5 @@
 import { readonly, isReadonly } from '../src/reactive';
+import { vi } from 'vitest';
 
 describe('readonly', () => {
   it('不可改写', () => {
@@ -12,7 +13,7 @@ describe('readonly', () => {
   });
 
   it('触发 readonly set的时候，作出警告', () => {
-    console.warn = jest.fn();
+    console.warn = vi.fn();
     const user = readonly({ age: 10 });
     user.age = 11;
     expect(console.warn).toBeCalledTimes(1);
