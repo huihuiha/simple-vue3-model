@@ -16,7 +16,7 @@ export function generate(ast: any) {
   const args = ['_ctx', '_cache'];
   const signature = args.join(', ');
 
-  push(`funciton ${functionName}(${signature}){`);
+  push(`function ${functionName}(${signature}){`);
   push('return ');
   genNode(ast.codegenNode, context);
   push('}');
