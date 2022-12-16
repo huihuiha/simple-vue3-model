@@ -1,5 +1,5 @@
 import { NodeTypes } from './ast';
-import { TO_DISPLAY_STRING } from './runtimehelpers';
+import { CREATE_ELEMENT_VNODE, TO_DISPLAY_STRING } from './runtimehelpers';
 
 export function transform(root: any, options: any = {}) {
   const context = createTransformContext(root, options);
@@ -14,9 +14,11 @@ export function transform(root: any, options: any = {}) {
 
 function traverseNode(node: any, context: any) {
   const nodeTransforms = context.nodeTransforms;
+  const exitFns: any = [];
   for (let i = 0; i < nodeTransforms.length; i++) {
     const transform = nodeTransforms[i];
-    transform(node);
+    const onExit = transform(node, context);
+    if (onExit) exitFns.push(onExit);
   }
 
   switch (node.type) {
@@ -27,6 +29,11 @@ function traverseNode(node: any, context: any) {
     case NodeTypes.ELEMENT:
       traverseChildren(node, context);
       break;
+  }
+
+  let i = exitFns.length;
+  while (i--) {
+    exitFns[i]();
   }
 }
 
@@ -43,8 +50,14 @@ function createTransformContext(root: any, options: any) {
   return context;
 }
 function createRootCodegen(root: any) {
-  root.codegenNode = root.children[0];
+  const child = root.children[0];
+  if (child.type === NodeTypes.ELEMENT) {
+    root.codegenNode = child.codegenNode;
+  } else {
+    root.codegenNode = root.children[0];
+  }
 }
+
 function traverseChildren(node: any, context: any) {
   const children = node.children;
 
