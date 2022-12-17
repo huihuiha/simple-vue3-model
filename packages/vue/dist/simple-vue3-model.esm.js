@@ -505,6 +505,7 @@ function shouldUpdateComponent(preVNode, nextVNode) {
 }
 
 const queue = [];
+const activePreFlushCbs = [];
 let isFlushPending = false;
 const p = Promise.resolve();
 function nextTick(fn) {
@@ -524,9 +525,15 @@ function queueFlush() {
 }
 function flushJobs() {
     isFlushPending = false;
+    flushPreFlushCbs();
     let job;
     while ((job = queue.shift())) {
         job && job();
+    }
+}
+function flushPreFlushCbs() {
+    for (let i = 0; i < activePreFlushCbs.length; i++) {
+        activePreFlushCbs[i]();
     }
 }
 
